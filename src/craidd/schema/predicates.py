@@ -904,11 +904,21 @@ _CLIMATE_SWEEP: tuple[PredicateDef, ...] = (
                  "standard_name air_temperature; QUDT unit DegreeCelsius; SOSA/O&M observation "
                  "result. Observed OR projected: a projection carries scenario/horizon/baseline + "
                  "uncertainty_basis; an observation carries uncertainty_basis=observed.",
+                 # R1 (Llys, 23/08/2026), raised by ARL-022 09/08. The sentence above said this in
+                 # PROSE and nothing enforced it — a bare number passed the gate, silently ambiguous
+                 # between a measured reading and a modelled projection, which is the one conflation
+                 # a climate evidence base must never make. `uncertainty_basis` ONLY: this predicate
+                 # carries observations too, and requiring the projection keys would make an
+                 # observation unemittable. SCH-CLAIM-001's dependentRequired already makes
+                 # `scenario` pull in `horizon` and `baseline`, so requiring the key that declares
+                 # WHICH KIND OF VALUE THIS IS is sufficient and complete.
+                 required_qualifiers=("uncertainty_basis",),
                  description_cy=CY_PENDING),
     PredicateDef("sea_surface_temperature_c", "real", "multi", ("coastal_cell", "station"),
                  "Sea-surface temperature, degrees Celsius. GCOS ECV SST; CF standard_name "
                  "sea_water_temperature; QUDT DegreeCelsius; SOSA/O&M. Observed or projected "
                  "(as air_temperature_mean_c).",
+                 required_qualifiers=("uncertainty_basis",),   # R1 — as air_temperature_mean_c
                  description_cy=CY_PENDING),
     PredicateDef("sea_level_rise_m", "real", "multi", ("coastal_cell",),
                  "Projected sea-level rise, metres, relative to the baseline period. GCOS ECV Sea "
@@ -926,6 +936,8 @@ _CLIMATE_SWEEP: tuple[PredicateDef, ...] = (
                  "Estimated peatland carbon stock, tonnes CO2e. Adopt-and-cite the IUCN UK Peatland "
                  "Programme / national peatland carbon mapping; SOSA/O&M estimate. Carry "
                  "uncertainty_basis; confidence_interval where the source states one.",
+                 # R1 — "Carry" was an instruction to a person, not a constraint. Now it is one.
+                 required_qualifiers=("uncertainty_basis",),
                  description_cy=CY_PENDING),
     PredicateDef("shoreline_management_policy", "text", "multi", ("coastal_cell",),
                  "Defra Shoreline Management Plan (SMP2) policy for a coastal cell, per epoch. "
